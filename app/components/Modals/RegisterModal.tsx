@@ -70,7 +70,8 @@ const RegisterModal = () => {
                 disabled={isLoading}
                 register={register}
                 errors={errors}
-                required>
+                required
+                large={false}>
             </Input>
             <Input
                 id="email"
@@ -79,7 +80,8 @@ const RegisterModal = () => {
                 disabled={isLoading}
                 register={register}
                 errors={errors}
-                required>
+                required
+                large={false}>
             </Input>
             <Input
                 id="password"
@@ -88,7 +90,8 @@ const RegisterModal = () => {
                 disabled={isLoading}
                 register={register}
                 errors={errors}
-                required>
+                required
+                large={false}>
             </Input>
 
         </div>
