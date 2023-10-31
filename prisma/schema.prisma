@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  name String?
+  email String? @unique 
+  emailVerified DateTime?
+  image String?
+  hashedPassword String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  favoriteIds String[] @db.ObjectId @default([])
+  projectIds String[] @db.ObjectId @default([])
+
+  //Relationships
+  //A single user can have many projects (projects need to have an owner attribute)
+  //or should it be created projects and joined projects 
+  accounts Account[]
+  projects ProjectUser[]
+  //events Event[]
+
+}
+
+//Used for social log ins 
+model Account {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  type String
+  provider String
+  providerAccountId String
+  refresh_token String? @db.String
+  access_token String? @db.String
+  expires_at Int?
+  token_type String?
+  scope String?
+  id_token String? @db.String
+  session_state String?
+
+  //Soring the user model's id value in the Account model's userId field
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  //There needs to be a unique comination of these fields 
+  @@unique([provider, providerAccountId])
+
+}
+
+model ProjectUser {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
+  user User @relation(fields: [userId], references: [id])
+  project Project @relation(fields: [projectId], references: [id])
+  projectId String @db.ObjectId
+  creator Boolean
+  @@unique([projectId, userId])
+  //@@id([projectId, userId])
+  //Above composite id is not working so rememeber to include constraint for checking if a user 
+  //is already added to a project so projecr user instances are not duplicated 
+  //https://stackoverflow.com/questions/53373101/prisma-datamodel-primary-key-as-a-combination-of-two-relational-models
+  //update: added @@unique so should be handled 
+}
+
+model Project {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  title String
+  description String
+  createdAt DateTime @default(now())
+  category String
+  //tools_technologies String[]
+  difficulty Int
+  locationValue String
+  imageSrc String
+  //Status
+  creatorId String @db.ObjectId
+
+  members ProjectUser[]
+
+  memberIds String[] @default([])
+}
+
+model Request{
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  requestorId String @db.ObjectId
+  projectId String @db.ObjectId
+  message String
+}
