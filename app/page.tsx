@@ -11,7 +11,12 @@ type HomeProps = {
   searchParams: IProjectsParams;
 }
 
+export const dynamic = "force-dynamic"
+
+
 export default async function Home({searchParams} : HomeProps) {
+
+  
 
   const projects = await getProjects(searchParams);
   const currentUser = await getCurrentUser();
